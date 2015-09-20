@@ -25,17 +25,21 @@ forkThread action
         tid <- forkFinally action (_setTerminated waitOn)
         return (Thread tid waitOn)
 
-        
+
 _setTerminated :: WaitOn -> (Either SomeException a) -> IO ()
 _setTerminated waitOn (Right _)
     = putMVar waitOn ()
     
-_setTerminated waitOn (Left someException)
+setTerminated waitOn (Left someException)
     = do
         putMVar waitOn ()
         throw someException
     
-        
+isTerminated :: Thread
+             -> IO Bool
+isTerminated (Thread tid waitOn)
+    = isEmptyMVar waitOn
+
         
 joinThread :: Thread -> IO ()
 joinThread (Thread threadId waitOn)
