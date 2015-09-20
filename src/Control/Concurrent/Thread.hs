@@ -22,15 +22,15 @@ forkThread :: IO () -> IO Thread
 forkThread action 
     = do
         waitOn <- newEmptyMVar
-        tid <- forkFinally action (setTerminated waitOn)
+        tid <- forkFinally action (_setTerminated waitOn)
         return (Thread tid waitOn)
 
         
-setTerminated :: WaitOn -> (Either SomeException a) -> IO ()
-setTerminated waitOn (Right _)
+_setTerminated :: WaitOn -> (Either SomeException a) -> IO ()
+_setTerminated waitOn (Right _)
     = putMVar waitOn ()
     
-setTerminated waitOn (Left someException)
+_setTerminated waitOn (Left someException)
     = do
         putMVar waitOn ()
         throw someException
