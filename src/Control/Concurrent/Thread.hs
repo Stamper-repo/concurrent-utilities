@@ -1,6 +1,7 @@
 module Control.Concurrent.Thread
     ( Thread
     , forkThread
+    , isTerminated
     , joinThread
     , joinThreads
     , getThreadId
@@ -30,7 +31,7 @@ _setTerminated :: WaitOn -> (Either SomeException a) -> IO ()
 _setTerminated waitOn (Right _)
     = putMVar waitOn ()
     
-setTerminated waitOn (Left someException)
+_setTerminated waitOn (Left someException)
     = do
         putMVar waitOn ()
         throw someException
