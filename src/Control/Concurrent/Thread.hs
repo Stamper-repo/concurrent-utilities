@@ -39,14 +39,20 @@ _setTerminated waitOn (Left someException)
 isTerminated :: Thread
              -> IO Bool
 isTerminated (Thread tid waitOn)
-    = isEmptyMVar waitOn
+    = do
+        isTerm <- isEmptyMVar waitOn
+        return (not isTerm)
 
         
 joinThread :: Thread -> IO ()
-joinThread (Thread threadId waitOn)
+joinThread t@(Thread threadId waitOn)
     = do
-        _ <- takeMVar waitOn
-        return ()
+        isTerm <- isTerminated t
+        case isTerm of
+            True -> return ()
+            False -> do
+                _ <- takeMVar waitOn
+                return ()
 
         
 joinThreads :: [Thread] -> IO ()
