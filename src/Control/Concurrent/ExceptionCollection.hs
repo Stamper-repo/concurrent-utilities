@@ -4,6 +4,7 @@ module Control.Concurrent.ExceptionCollection
     , logException
     , readExceptions
     , collectExceptions
+    , hasExceptions
     ) where
 
 import Control.Concurrent.MVar
@@ -25,8 +26,16 @@ logException (ExceptionCollection exceptionsM) e
     = do
         raisedExceptions <- takeMVar exceptionsM
         putMVar exceptionsM (raisedExceptions ++ [e])
-        
-        
+
+
+hasExceptions :: ExceptionCollection e
+              -> IO Bool
+hasExceptions (ExceptionCollection exceptionsM)
+    = do
+        raisedExceptions <- readMVar exceptionsM
+        return (not $ null raisedExceptions)
+
+
 readExceptions :: ExceptionCollection e
                -> IO [e]
 readExceptions (ExceptionCollection exceptionsM)

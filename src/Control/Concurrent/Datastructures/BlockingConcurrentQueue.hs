@@ -8,6 +8,9 @@ import Control.Concurrent.Datastructures.ThreadWaitQueue
 data BlockingConcurrentQueue a = BlockingConcurrentQueue { queue :: MVar [a]
                                                          , threadWaitQueue :: ThreadWaitQueue -- Used to signal when to try again if the queue was empty and we wanted to take one
                                                          }
+
+instance Show (BlockingConcurrentQueue a) where
+    show _ = "BlockingConcurrentQueue"
                                  
 
 showBlockingConcurrentQueue :: (Show a) => BlockingConcurrentQueue a -> IO [Char]
@@ -59,9 +62,16 @@ takeFromBlockingConcurrentQueue blockingConcurrentQueue
 takeAllFromBlockingConcurrentQueue :: BlockingConcurrentQueue a -> IO [a]
 takeAllFromBlockingConcurrentQueue blockingConcurrentQueue
     = do
-        els <- takeMVar (queue blockingConcurrentQueue)
-        putMVar (queue blockingConcurrentQueue) []
-        return els
+        oldQueue <- takeMVar (queue blockingConcurrentQueue)
+        case oldQueue of
+            []       -> do
+                            queueTicket <- getQueueTicket (threadWaitQueue blockingConcurrentQueue)
+                            putMVar (queue blockingConcurrentQueue) []
+                            enterWaitQueueWithTicket queueTicket
+                            takeAllFromBlockingConcurrentQueue blockingConcurrentQueue
+            (el:els) -> do
+                            putMVar (queue blockingConcurrentQueue) []
+                            return (el:els)
         
     
 readAllFromBlockingConcurrentQueue :: BlockingConcurrentQueue a -> IO [a]
