@@ -6,7 +6,7 @@ name:                concurrent-utilities
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.2.0.0
+version:             0.2.0.1
 synopsis:            More utilities and broad-used datastructures for concurrency.
 description:         More utilities and broad-used datastructures for concurrency.
 homepage:            -
@@ -42,7 +42,7 @@ library
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.8 && <4.10
+  build-depends:       base >=4.8 && <4.11
   
   -- Directories containing source files.
   hs-source-dirs:      src
